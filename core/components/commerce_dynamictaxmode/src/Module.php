@@ -57,9 +57,6 @@ class Module extends BaseModule
             return;
         }
 
-        /**
-         * ISSUE: If this is a session cart order, then this doesn't get saved!
-         */
         $order = $event->getOrder();
         $order->set('is_inclusive', $sessionValue === 'inclusive');
         $order->save();
