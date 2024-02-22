@@ -68,12 +68,11 @@ class Module extends BaseModule
     public function getModuleConfiguration(\comModule $module): array
     {
         $fields = [];
-        $key = $module->getProperty('session_key');
         $fields[] = new TextField($this->commerce, [
-            'name' => 'session_key',
+            'name' => 'properties[session_key]',
             'label' => $this->adapter->lexicon('commerce_dynamictaxmode.session_key'),
             'description' => $this->adapter->lexicon('commerce_dynamictaxmode.session_key.description'),
-            'value' => !empty($key) ? $key : 'commerce_dynamictaxmode',
+            'value' => $module->getProperty('session_key', 'commerce_dynamictaxmode'),
         ]);
         return $fields;
     }
