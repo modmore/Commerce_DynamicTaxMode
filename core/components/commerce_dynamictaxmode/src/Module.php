@@ -4,7 +4,9 @@ namespace modmore\Commerce_DynamicTaxMode;
 
 use modmore\Commerce\Admin\Configuration\About\ComposerPackages;
 use modmore\Commerce\Admin\Sections\SimpleSection;
+use modmore\Commerce\Admin\Widgets\Form\TextField;
 use modmore\Commerce\Events\Admin\PageEvent;
+use modmore\Commerce\Events\Order;
 use modmore\Commerce\Modules\BaseModule;
 use modmore\Commerce\Dispatcher\EventDispatcher;
 
@@ -12,54 +14,71 @@ require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 class Module extends BaseModule
 {
-    public function getName()
+    public function getName(): string
     {
         $this->adapter->loadLexicon('commerce_dynamictaxmode:default');
         return $this->adapter->lexicon('commerce_dynamictaxmode');
     }
 
-    public function getAuthor()
+    public function getAuthor(): string
     {
-        return 'Your Name Here';
+        return 'modmore';
     }
 
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->adapter->lexicon('commerce_dynamictaxmode.description');
     }
 
-    public function initialize(EventDispatcher $dispatcher)
+    public function initialize(EventDispatcher $dispatcher): void
     {
         // Load our lexicon
         $this->adapter->loadLexicon('commerce_dynamictaxmode:default');
 
-        // Add the xPDO package, so Commerce can detect the derivative classes
-//        $root = dirname(__DIR__);
-//        $path = $root . '/model/';
-//        $this->adapter->loadPackage('commerce_dynamictaxmode', $path);
-
-        // Add template path to twig
-//        $root = dirname(__DIR__);
-//        $this->commerce->view()->addTemplatesPath($root . '/templates/');
+        $dispatcher->addListener(\Commerce::EVENT_ORDER_BEFORE_LOAD, [$this, 'setDynamicTaxMode']);
 
         // Add composer libraries to the about section
         $dispatcher->addListener(\Commerce::EVENT_DASHBOARD_LOAD_ABOUT, [$this, 'addLibrariesToAbout']);
     }
 
-    public function getModuleConfiguration(\comModule $module)
+    public function setDynamicTaxMode(Order $event)
+    {
+        $sessionKey = 'commerce_dynamictaxmode';
+        $module = $this->adapter->getObject(\comModule::class, [
+            'class_name' => 'modmore\Commerce_DynamicTaxMode\Module',
+        ]);
+        if ($module && !empty($module->getProperty('session_key'))) {
+            $sessionKey = $module->getProperty('session_key');
+        }
+
+        // Check if session key is set
+        $sessionValue = $_SESSION[$sessionKey] ?? '';
+        if (empty($sessionValue)) {
+            return;
+        }
+
+        /**
+         * ISSUE: If this is a session cart order, then this doesn't get saved!
+         */
+        $order = $event->getOrder();
+        $order->set('is_inclusive', $sessionValue === 'inclusive');
+        $order->save();
+    }
+
+    public function getModuleConfiguration(\comModule $module): array
     {
         $fields = [];
-
-        // A more detailed description to be shown in the module configuration. Note that the module description
-        // ({@see self:getDescription}) is automatically shown as well.
-//        $fields[] = new DescriptionField($this->commerce, [
-//            'description' => $this->adapter->lexicon('commerce_dynamictaxmode.module_description'),
-//        ]);
-
+        $key = $module->getProperty('session_key');
+        $fields[] = new TextField($this->commerce, [
+            'name' => 'session_key',
+            'label' => $this->adapter->lexicon('commerce_dynamictaxmode.session_key'),
+            'description' => $this->adapter->lexicon('commerce_dynamictaxmode.session_key.description'),
+            'value' => !empty($key) ? $key : 'commerce_dynamictaxmode',
+        ]);
         return $fields;
     }
 
-    public function addLibrariesToAbout(PageEvent $event)
+    public function addLibrariesToAbout(PageEvent $event): void
     {
         $lockFile = dirname(__DIR__, 2) . '/composer.lock';
         if (file_exists($lockFile)) {
@@ -67,7 +86,7 @@ class Module extends BaseModule
             $section->addWidget(new ComposerPackages($this->commerce, [
                 'lockFile' => $lockFile,
                 'heading' => $this->adapter->lexicon('commerce.about.open_source_libraries') . ' - ' . $this->adapter->lexicon('commerce_dynamictaxmode'),
-                'introduction' => '', // Could add information about how libraries are used, if you'd like
+                'introduction' => '',
             ]));
 
             $about = $event->getPage();
