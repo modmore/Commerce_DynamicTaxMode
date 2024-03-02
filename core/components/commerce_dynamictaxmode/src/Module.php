@@ -14,6 +14,8 @@ require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 class Module extends BaseModule
 {
+    public const DEFAULT_SESSION_KEY = 'commerce_dynamictaxmode';
+
     public function getName(): string
     {
         $this->adapter->loadLexicon('commerce_dynamictaxmode:default');
@@ -35,15 +37,19 @@ class Module extends BaseModule
         // Load our lexicon
         $this->adapter->loadLexicon('commerce_dynamictaxmode:default');
 
+        $root = dirname(__DIR__);
+        $path = $root . '/model/';
+        $this->adapter->loadPackage('commerce_dynamictaxmode', $path);
+
         $dispatcher->addListener(\Commerce::EVENT_ORDER_BEFORE_LOAD, [$this, 'setDynamicTaxMode']);
 
         // Add composer libraries to the about section
         $dispatcher->addListener(\Commerce::EVENT_DASHBOARD_LOAD_ABOUT, [$this, 'addLibrariesToAbout']);
     }
 
-    public function setDynamicTaxMode(Order $event)
+    public function setDynamicTaxMode(Order $event): void
     {
-        $sessionKey = 'commerce_dynamictaxmode';
+        $sessionKey = self::DEFAULT_SESSION_KEY;
         $module = $this->adapter->getObject(\comModule::class, [
             'class_name' => 'modmore\Commerce_DynamicTaxMode\Module',
         ]);

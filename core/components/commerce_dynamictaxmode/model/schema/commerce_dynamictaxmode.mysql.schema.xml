@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model package="commerce_dynamictaxmode" baseClass="comSimpleObject" platform="mysql" defaultEngine="InnoDB" version="1.1">
+    <object class="DynamicTaxModeProduct" extends="comProduct" />
     <!--<object class="DynamictaxmodeOrderMessage" extends="comOrderMessage" />-->
-    <!--<object class="DynamictaxmodeProduct" extends="comProduct" />-->
     <!--<object class="DynamictaxmodeShippingMethod" extends="comShippingMethod" />-->
 </model>
