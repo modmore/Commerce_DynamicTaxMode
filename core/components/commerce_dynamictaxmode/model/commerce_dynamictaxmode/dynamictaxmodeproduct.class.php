@@ -121,7 +121,7 @@ class DynamicTaxModeProduct extends comProduct
             $taxMode = $_SESSION[$this->sessionKey] ?? '';
         }
 
-        $raw = $taxMode === 'inclusive' ? $this->getRawBusinessPricing() : $this->getRawPricing();
+        $raw = $taxMode === 'inclusive' ? $this->getRawPricing() : $this->getRawBusinessPricing();
 
         return $this->loadPricingInstance($raw, $currency);
     }
