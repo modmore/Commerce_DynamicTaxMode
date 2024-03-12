@@ -13,7 +13,8 @@
 
     <!-- Exclude paths -->
     <exclude-pattern>*/vendor/*</exclude-pattern>
-    <exclude-pattern>*/model/mysql/*</exclude-pattern>
+    <exclude-pattern>*/model/*/mysql/*</exclude-pattern>
+    <exclude-pattern>*/model/*/metadata.mysql.php</exclude-pattern>
 
     <!-- Our base rule: set to PSR12-->
     <rule ref="PSR12">
@@ -29,6 +30,6 @@
     </rule>
 
     <rule ref="PSR1.Classes.ClassDeclaration.MissingNamespace">
-<!--        <exclude-pattern>file/with/no-namespace.php</exclude-pattern>-->
+        <exclude-pattern>*/model/*/*.class.php</exclude-pattern>
     </rule>
 </ruleset>
