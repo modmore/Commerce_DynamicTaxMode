@@ -42,9 +42,6 @@ class Module extends BaseModule
         $this->adapter->loadPackage('commerce_dynamictaxmode', $path);
 
         $dispatcher->addListener(\Commerce::EVENT_ORDER_BEFORE_LOAD, [$this, 'setDynamicTaxMode']);
-
-        // Add composer libraries to the about section
-        $dispatcher->addListener(\Commerce::EVENT_DASHBOARD_LOAD_ABOUT, [$this, 'addLibrariesToAbout']);
     }
 
     public function setDynamicTaxMode(Order $event): void
@@ -78,21 +75,5 @@ class Module extends BaseModule
             'value' => $module->getProperty('session_key', 'commerce_dynamictaxmode'),
         ]);
         return $fields;
-    }
-
-    public function addLibrariesToAbout(PageEvent $event): void
-    {
-        $lockFile = dirname(__DIR__, 2) . '/composer.lock';
-        if (file_exists($lockFile)) {
-            $section = new SimpleSection($this->commerce);
-            $section->addWidget(new ComposerPackages($this->commerce, [
-                'lockFile' => $lockFile,
-                'heading' => $this->adapter->lexicon('commerce.about.open_source_libraries') . ' - ' . $this->adapter->lexicon('commerce_dynamictaxmode'),
-                'introduction' => '',
-            ]));
-
-            $about = $event->getPage();
-            $about->addSection($section);
-        }
     }
 }
