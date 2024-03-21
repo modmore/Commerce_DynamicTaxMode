@@ -95,6 +95,8 @@ class DynamicTaxModeProduct extends comProduct
      */
     protected function getPricingInstance(comCurrency $currency): ?ProductPricing
     {
+        $taxMode = '';
+
         // 1. Check for comOrder::is_inclusive
         $order = null;
         if (isset($_SESSION[comOrder::SESSION_NAME]) && $_SESSION[comOrder::SESSION_NAME] > 0) {
@@ -119,6 +121,11 @@ class DynamicTaxModeProduct extends comProduct
         // 2. As a backup, check for dynamic tax mode inclusive/exclusive session value
         if (empty($taxMode)) {
             $taxMode = $_SESSION[$this->sessionKey] ?? '';
+        }
+
+        // 3. As a final backup, use the system default
+        if (empty($taxMode)) {
+            $taxMode = $this->commerce->isTaxExclusive() ? 'exclusive' : 'inclusive';
         }
 
         $raw = $taxMode === 'inclusive' ? $this->getRawPricing() : $this->getRawBusinessPricing();

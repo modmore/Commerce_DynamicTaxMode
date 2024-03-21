@@ -1,5 +1,12 @@
-Dynamictaxmode for Commerce 0.1.0-pl
+Dynamictaxmode for Commerce 0.1.0-rc2
 ---------------------------------
-Released on
+Released on 2024-03-12
+
+- Fix system-default tax mode not being set before an order is available
+
+
+Dynamictaxmode for Commerce 0.1.0-rc1
+---------------------------------
+Released on 2024-03-12
 
 - First release
