@@ -1,11 +1,11 @@
-Dynamictaxmode for Commerce 0.1.0-rc2
+Dynamictaxmode for Commerce 1.0.0-rc2
 ---------------------------------
 Released on 2024-03-21
 
 - Fix system-default tax mode not being set before an order is available
 - Fix missing vendor directory in release
 
-Dynamictaxmode for Commerce 0.1.0-rc1
+Dynamictaxmode for Commerce 1.0.0-rc1
 ---------------------------------
 Released on 2024-03-12
 
